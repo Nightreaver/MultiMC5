@@ -29,8 +29,6 @@
 #include "logic/LegacyUpdate.h"
 #include "logic/icons/IconList.h"
 
-#include "gui/dialogs/LegacyModEditDialog.h"
-
 LegacyInstance::LegacyInstance(const QString &rootDir, SettingsObject *settings,
 							   QObject *parent)
 	: BaseInstance(new LegacyInstancePrivate(), rootDir, settings, parent)
@@ -146,7 +144,7 @@ std::shared_ptr<ModList> LegacyInstance::texturePackList()
 
 QDialog *LegacyInstance::createModEditDialog(QWidget *parent)
 {
-	return new LegacyModEditDialog(this, parent);
+	return nullptr;
 }
 
 QString LegacyInstance::jarModsDir() const
@@ -288,10 +286,7 @@ QString LegacyInstance::getStatusbarDescription()
 {
 	if (flags().contains(VersionBrokenFlag))
 	{
-		return "Legacy : " + intendedVersionId() + " (broken)";
+		return tr("Legacy : %1 (broken)").arg(intendedVersionId());
 	}
-	if (shouldUpdate())
-		return "Legacy : " + currentVersionId() + " -> " + intendedVersionId();
-	else
-		return "Legacy : " + currentVersionId();
+	return tr("Legacy : %1").arg(intendedVersionId());
 }
