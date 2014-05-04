@@ -29,7 +29,8 @@
 #include "gui/dialogs/InstanceEditDialog.h"
 #include <MMCError.h>
 
-OneSixInstance::OneSixInstance(const QString &rootDir, SettingsObject *settings, QObject *parent)
+OneSixInstance::OneSixInstance(const QString &rootDir, SettingsObject *settings,
+							   QObject *parent)
 	: BaseInstance(new OneSixInstancePrivate(), rootDir, settings, parent)
 {
 	I_D(OneSixInstance);
@@ -47,7 +48,7 @@ void OneSixInstance::init()
 		{
 			reloadVersion();
 		}
-		catch(MMCError & e)
+		catch (MMCError &e)
 		{
 			// QLOG_ERROR() << "Caught exception on instance init: " << e.cause();
 		}
@@ -125,7 +126,7 @@ QDir OneSixInstance::reconstructAssets(std::shared_ptr<VersionFinal> version)
 			QString original_path =
 				PathCombine(PathCombine(objectDir.path(), tlk), asset_object.hash);
 			QFile original(original_path);
-			if(!original.exists())
+			if (!original.exists())
 				continue;
 			if (!target.exists())
 			{
@@ -137,7 +138,7 @@ QDir OneSixInstance::reconstructAssets(std::shared_ptr<VersionFinal> version)
 
 				bool couldCopy = original.copy(target_path);
 				QLOG_DEBUG() << " Copying" << original_path << "to" << target_path
-								<< QString::number(couldCopy); // << original.errorString();
+							 << QString::number(couldCopy); // << original.errorString();
 			}
 		}
 
@@ -206,8 +207,20 @@ MinecraftProcess *OneSixInstance::prepareForLaunch(AuthSessionPtr session)
 		{
 			launchScript += "cp " + librariesPath().absoluteFilePath(lib->storagePath()) + "\n";
 		}
-		QString targetstr = version->id + "/" + version->id + ".jar";
-		launchScript += "cp " + versionsPath().absoluteFilePath(targetstr) + "\n";
+		QString minecraftjarpath;
+		if (version->hasJarMods())
+		{
+			for (auto jarmod : version->jarMods)
+			{
+				launchScript += "cp " + jarmodsPath().absoluteFilePath(jarmod->name) + "\n";
+			}
+			minecraftjarpath = version->id + "/" + version->id + "-stripped.jar";
+		}
+		else
+		{
+			minecraftjarpath = version->id + "/" + version->id + ".jar";
+		}
+		launchScript += "cp " + versionsPath().absoluteFilePath(minecraftjarpath) + "\n";
 	}
 	launchScript += "mainClass " + version->mainClass + "\n";
 
@@ -232,12 +245,16 @@ MinecraftProcess *OneSixInstance::prepareForLaunch(AuthSessionPtr session)
 	}
 	QDir natives_dir(PathCombine(instanceRoot(), "natives/"));
 	launchScript += "windowTitle " + windowTitle() + "\n";
-	for(auto native: version->getActiveNativeLibs())
+	for (auto native : version->getActiveNativeLibs())
 	{
 		QFileInfo finfo(PathCombine("libraries", native->storagePath()));
 		launchScript += "ext " + finfo.absoluteFilePath() + "\n";
 	}
 	launchScript += "natives " + natives_dir.absolutePath() + "\n";
+	for (auto trait : version->traits)
+	{
+		launchScript += "trait " + trait + "\n";
+	}
 	launchScript += "launcher onesix\n";
 
 	// create the process and set its parameters
@@ -326,7 +343,7 @@ bool OneSixInstance::versionIsCustom()
 {
 	I_D(const OneSixInstance);
 	auto ver = d->version;
-	if(ver)
+	if (ver)
 	{
 		return !ver->isVanilla();
 	}
@@ -337,7 +354,7 @@ bool OneSixInstance::versionIsFTBPack()
 {
 	I_D(const OneSixInstance);
 	auto ver = d->version;
-	if(ver)
+	if (ver)
 	{
 		return ver->hasFtbPack();
 	}
@@ -359,11 +376,11 @@ void OneSixInstance::reloadVersion()
 		d->m_flags.remove(VersionBrokenFlag);
 		emit versionReloaded();
 	}
-	catch(MMCError & error)
+	catch (MMCError &error)
 	{
 		d->version->clear();
 		d->m_flags.insert(VersionBrokenFlag);
-		//TODO: rethrow to show some error message(s)?
+		// TODO: rethrow to show some error message(s)?
 		emit versionReloaded();
 		throw;
 	}
@@ -416,8 +433,8 @@ QString OneSixInstance::getStatusbarDescription()
 	{
 		traits.append(tr("broken"));
 	}
-	
-	if(traits.size())
+
+	if (traits.size())
 	{
 		return tr("Minecraft %1 (%2)").arg(intendedVersionId()).arg(traits.join(", "));
 	}
@@ -431,6 +448,12 @@ QDir OneSixInstance::librariesPath() const
 {
 	return QDir::current().absoluteFilePath("libraries");
 }
+
+QDir OneSixInstance::jarmodsPath() const
+{
+	return QDir(jarModsDir());
+}
+
 QDir OneSixInstance::versionsPath() const
 {
 	return QDir::current().absoluteFilePath("versions");
@@ -448,7 +471,7 @@ bool OneSixInstance::providesVersionFile() const
 
 bool OneSixInstance::reload()
 {
-	if(BaseInstance::reload())
+	if (BaseInstance::reload())
 	{
 		try
 		{
@@ -486,4 +509,23 @@ QString OneSixInstance::instanceConfigFolder() const
 QString OneSixInstance::jarModsDir() const
 {
 	return PathCombine(instanceRoot(), "jarmods");
+}
+
+QString OneSixInstance::libDir() const
+{
+	return PathCombine(minecraftRoot(), "lib");
+}
+
+QStringList OneSixInstance::extraArguments() const
+{
+	auto list = BaseInstance::extraArguments();
+	auto version = getFullVersion();
+	if (!version)
+		return list;
+	if (version->hasJarMods())
+	{
+		list.append({"-Dfml.ignoreInvalidMinecraftCertificates=true",
+					 "-Dfml.ignorePatchDiscrepancies=true"});
+	}
+	return list;
 }
