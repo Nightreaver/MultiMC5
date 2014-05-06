@@ -245,24 +245,6 @@ MinecraftProcess *OneSixInstance::prepareForLaunch(AuthSessionPtr session)
 		launchScript += "windowParams " + windowParams + "\n";
 	}
 	
-	// window size, title and state, onesix
-	{
-		bool maximize = settings().get("LaunchMaximized").toBool();
-		if (maximize)
-		{
-			// FIXME: there is no good way to maximize the minecraft window in onesix.
-			// this is probably a BAD idea
-			// launchScript += "param --fullscreen\n";
-		}
-		else
-		{
-			launchScript +=
-				"param --width\nparam " + settings().get("MinecraftWinWidth").toString() + "\n";
-			launchScript +=
-				"param --height\nparam " + settings().get("MinecraftWinHeight").toString() + "\n";
-		}
-	}
-	
 	// legacy auth
 	{
 		launchScript += "userName " + session->player_name + "\n";
