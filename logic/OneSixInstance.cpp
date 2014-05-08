@@ -225,6 +225,10 @@ MinecraftProcess *OneSixInstance::prepareForLaunch(AuthSessionPtr session)
 		launchScript += "cp " + versionsPath().absoluteFilePath(minecraftjarpath) + "\n";
 	}
 	launchScript += "mainClass " + version->mainClass + "\n";
+	if(!version->appletClass.isEmpty())
+	{
+		launchScript += "appletClass " + version->appletClass + "\n";
+	}
 
 	// generic minecraft params
 	for (auto param : processMinecraftArgs(session))

@@ -586,6 +586,7 @@ set(MULTIMC_QRCS
 	resources/backgrounds/backgrounds.qrc
 	resources/multimc/multimc.qrc
 	resources/instances/instances.qrc
+	resources/versions/versions.qrc
 )
 
 
