@@ -68,11 +68,11 @@
 
 #include "gui/ConsoleWindow.h"
 
-#include "logic/lists/InstanceList.h"
-#include "logic/lists/MinecraftVersionList.h"
-#include "logic/lists/LwjglVersionList.h"
+#include "logic/InstanceList.h"
+#include "logic/minecraft/MinecraftVersionList.h"
+#include "logic/LwjglVersionList.h"
 #include "logic/icons/IconList.h"
-#include "logic/lists/JavaVersionList.h"
+#include "logic/java/JavaVersionList.h"
 
 #include "logic/auth/flows/AuthenticateTask.h"
 #include "logic/auth/flows/RefreshTask.h"
@@ -90,7 +90,7 @@
 #include "logic/InstanceFactory.h"
 #include "logic/MinecraftProcess.h"
 #include "logic/OneSixUpdate.h"
-#include "logic/JavaUtils.h"
+#include "logic/java/JavaUtils.h"
 #include "logic/NagUtils.h"
 #include "logic/SkinUtils.h"
 
