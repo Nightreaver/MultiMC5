@@ -445,6 +445,8 @@ SET(MULTIMC_SOURCES
 	logic/minecraft/OneSixRule.h
 	logic/minecraft/OpSys.cpp
 	logic/minecraft/OpSys.h
+	logic/minecraft/ParseUtils.cpp
+	logic/minecraft/ParseUtils.h
 	logic/minecraft/RawLibrary.cpp
 	logic/minecraft/RawLibrary.h
 	logic/minecraft/VersionBuilder.cpp
@@ -454,10 +456,6 @@ SET(MULTIMC_SOURCES
 	logic/minecraft/VersionFinal.cpp
 	logic/minecraft/VersionFinal.h
 	logic/minecraft/VersionPatch.h
-
-	# Trivial operating system utilities
-	logic/minecraft/OpSys.h
-	logic/minecraft/OpSys.cpp
 
 	# Various base classes
 	logic/BaseInstaller.h

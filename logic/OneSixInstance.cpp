@@ -225,7 +225,10 @@ MinecraftProcess *OneSixInstance::prepareForLaunch(AuthSessionPtr session)
 		}
 		launchScript += "cp " + versionsPath().absoluteFilePath(minecraftjarpath) + "\n";
 	}
-	launchScript += "mainClass " + version->mainClass + "\n";
+	if(!version->mainClass.isEmpty())
+	{
+		launchScript += "mainClass " + version->mainClass + "\n";
+	}
 	if(!version->appletClass.isEmpty())
 	{
 		launchScript += "appletClass " + version->appletClass + "\n";
@@ -273,7 +276,8 @@ MinecraftProcess *OneSixInstance::prepareForLaunch(AuthSessionPtr session)
 		launchScript += "traits " + trait + "\n";
 	}
 	launchScript += "launcher onesix\n";
-
+	QLOG_INFO() << launchScript;
+	
 	// create the process and set its parameters
 	MinecraftProcess *proc = new MinecraftProcess(this);
 	proc->setWorkdir(minecraftRoot());
