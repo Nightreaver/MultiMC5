@@ -276,7 +276,6 @@ MinecraftProcess *OneSixInstance::prepareForLaunch(AuthSessionPtr session)
 		launchScript += "traits " + trait + "\n";
 	}
 	launchScript += "launcher onesix\n";
-	QLOG_INFO() << launchScript;
 	
 	// create the process and set its parameters
 	MinecraftProcess *proc = new MinecraftProcess(this);
